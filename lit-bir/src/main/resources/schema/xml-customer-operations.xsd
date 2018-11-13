@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Fulfillment">
+		<xs:annotation>
+			<xs:documentation>Fulfillment Document Root Element
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Header" />
+				<xs:element ref="Body" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!-- HEADER -->
+	<xs:annotation>
+		<xs:documentation>Header</xs:documentation>
+	</xs:annotation>
+	<xs:element name="Header">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="GeneratedBy" />
+				<xs:element ref="GenerationDate" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GeneratedBy" type="systemNamesType" />
+	<xs:element name="GenerationDate" type="xs:dateTime" />
+	<!-- BODY -->
+	<xs:annotation>
+		<xs:documentation>Body</xs:documentation>
+	</xs:annotation>
+	<xs:element name="Body">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="Operations" />
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Operations">
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:group ref="customerOperationsGroup" />
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="systemNamesType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CORE" />
+			<xs:enumeration value="JCORE" />
+			<xs:enumeration value="ONLINE LIBRARY" />
+			<xs:enumeration value="ALM" />
+			<xs:enumeration value="ERP" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:group name="customerOperationsGroup">
+		<xs:choice>
+			<xs:element ref="CreateCustomer" />
+		</xs:choice>
+	</xs:group>
+
+	<xs:element name="CreateCustomer">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="CustomerType" />
+				<xs:element ref="CustomerStatus" />
+				<xs:element ref="CustomerName" />
+				<xs:element ref="AdminPassword" />
+				<xs:element ref="Email" minOccurs="0" />
+				<xs:element ref="RegistrationKey" minOccurs="0" />
+				<xs:element ref="MaxRegisteredUsers" />
+				<xs:element ref="AllowOnlineRegistration" />
+				<xs:element ref="ConcurrencyPrivilege" minOccurs="0" />
+				<xs:element ref="WintouchID" minOccurs="0" />
+				<xs:element ref="CountryCode" minOccurs="0" />
+				<xs:element ref="SequenceNumber" />
+			</xs:sequence>
+			<xs:attribute name="customer-id" type="customerIdType"
+				use="required" />
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="SequenceNumber" type="xs:string" />
+	<xs:element name="ConcurrencyPrivilege" type="concurrencyPrivilegeType" />
+	<xs:element name="Email" type="simpleEmailType" />
+	<xs:element name="CustomerType" type="customerTypeEnumeration" />
+	<xs:element name="CustomerStatus" type="statusEnumeration" />
+	<xs:element name="CustomerName" type="customerNameType" />
+	<xs:element name="AdminPassword" type="passwordType" />
+	<xs:element name="RegistrationKey" type="customerRegistrationKeyType" />
+	<xs:element name="MaxRegisteredUsers" type="nonNegativeIntegerType" />
+	<xs:element name="AllowOnlineRegistration" type="xs:boolean" />
+	<xs:element name="WintouchID" type="wintouchIdType" />
+	<xs:element name="CountryCode" type="isoCountryCodeType" />
+
+	<xs:simpleType name="concurrencyPrivilegeType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="BAL" />
+			<xs:enumeration value="EAL" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="simpleEmailType">
+		<xs:restriction base="noSpaceString">
+			<xs:pattern value="[^@]+@[^.]+\..+" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="noSpaceString">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\S+" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="customerTypeEnumeration">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="STANDARD" />
+			<xs:enumeration value="COMPLIMENTARY" />
+			<xs:enumeration value="SOCIETY" />
+			<xs:enumeration value="SOCIETYB" />
+			<xs:enumeration value="PERSONAL" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="isoCountryCodeType">
+		<xs:restriction base="xs:string">
+			<xs:length value="2" />
+			<xs:pattern value="[A-Z]{2}" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="statusEnumeration">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AWAITING_ACTIVATION" />
+			<xs:enumeration value="ACTIVE" />
+			<xs:enumeration value="SUSPENDED" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="customerNameType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="128" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="passwordType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+			<xs:maxLength value="60" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="customerRegistrationKeyType">
+		<xs:restriction base="restrictedAsciiWithEntityString">
+			<xs:maxLength value="255" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="nonNegativeIntegerType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]+" />
+			<xs:pattern value="" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="restrictedAsciiWithEntityString">
+		<xs:annotation>
+			<xs:documentation>Customer Id ASCII</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:pattern value="[\p{IsBasicLatin}\p{IsLatin-1Supplement}]+"></xs:pattern>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="wintouchIdType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="50" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="customerIdType">
+		<xs:restriction base="restrictedAsciiWithEntityString">
+			<xs:maxLength value="255" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

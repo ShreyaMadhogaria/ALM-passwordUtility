@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="lit-bir" default="make-jar" basedir=".">
+
+  <!-- ====================================================================== -->
+  <!-- Build environment properties                                           -->
+  <!-- ====================================================================== -->
+
+  <property name="project.lib.dir" value="lib"/>
+  <property name="build.finalName" value="lit-bir"/>
+  <property name="target.build.dir" value="target"/>
+  <property name="build.outputDir" value="${target.build.dir}/classes"/>
+  <property name="build.srcDir" value="src/main/java"/>
+  <property name="build.resourceDir.0" value="src/main/resources"/>
+
+  <!-- ====================================================================== -->
+  <!-- Defining classpaths                                                    -->
+  <!-- ====================================================================== -->
+
+	<target name="build-classpath">
+		<path id="build.classpath">
+		  	  	 <fileset dir="${project.lib.dir}">
+		  	  	       <include name="**/*.jar"/>
+		  	  	 </fileset>
+		    </path>
+			<pathconvert property="classpath.name" pathsep=" ">
+				<path refid="build.classpath" />
+				<mapper>
+					<chainedmapper>
+						<flattenmapper />
+						<globmapper from="*.jar" to="lib/*.jar" />
+					</chainedmapper>
+				</mapper>
+			</pathconvert> 
+	</target>
+
+	
+  <!-- ====================================================================== -->
+  <!-- Cleaning up target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="clean" description="Clean the output directory">
+    <delete dir="${target.build.dir}"/>
+    <!-- <delete dir="${project.lib.dir}"/> -->
+  </target>
+	
+  <!-- ====================================================================== -->
+  <!-- Compilation target                                                     -->
+  <!-- ====================================================================== -->
+
+  <target name="compile" depends="clean,get-deps,build-classpath" description="Compile the code">
+    <mkdir dir="${build.outputDir}"/>
+    <javac destdir="${build.outputDir}" 
+           nowarn="false" 
+           debug="true" 
+           optimize="false" 
+           deprecation="true" 
+           target="1.7" 
+           verbose="false" 
+           fork="false" 
+           source="1.7">
+      <src>
+        <pathelement location="${build.srcDir}"/>
+      </src>
+      <classpath refid="build.classpath"/>
+    </javac>
+    <copy todir="${build.outputDir}">
+      <fileset dir="${build.resourceDir.0}">
+          <include name="*.xml"/>
+      </fileset>
+      <fileset dir="${build.resourceDir.0}/config">
+    	 <include name="*.properties"/>
+      </fileset>
+      <fileset dir="${build.resourceDir.0}/schema">
+    	 <include name="*.xsd"/>
+      </fileset>
+    </copy>
+  	<copy todir="${build.outputDir}/lib">
+  		<fileset dir="${project.lib.dir}">
+  		          <include name="**/*.jar"/>
+  		      </fileset>
+  	</copy>
+  </target>
+
+
+  <!-- ====================================================================== -->
+  <!-- Package target                                                         -->
+  <!-- ====================================================================== -->
+	
+	
+  <target name="package" depends="compile" description="Package the application">
+  	<echo message="classpath.name : ${classpath.name}" />
+    <jar jarfile="${target.build.dir}/${build.finalName}.jar" 
+         compress="true" 
+         index="false" 
+         basedir="${build.outputDir}" 
+         excludes="**/package.html">
+    	<manifest>
+    	    <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+    	    <attribute name="Rsrc-Main-Class" value="com.wiley.bir.BirApplication"/>
+    	    <attribute name="Class-Path" value="."/>
+    	    <attribute name="Rsrc-Class-Path" value="./ ${classpath.name}"/>
+    	</manifest>
+    	<zipfileset src="jar-in-jar-loader.zip"/>
+  	</jar>
+  	
+  	
+  </target>
+
+  <!-- ====================================================================== -->
+  <!-- A dummy target for the package named after the type it creates         -->
+  <!-- ====================================================================== -->
+
+   <target name="make-jar" depends="package" description="Builds the jar for the application"/>
+
+  <!-- ====================================================================== -->
+  <!-- Download dependencies target                                           -->
+  <!-- ====================================================================== -->
+
+  <target name="get-deps" 
+          description="Download all dependencies">
+    <mkdir dir="${project.lib.dir}"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/ch/qos/logback/logback-core/1.2.3/logback-core-1.2.3.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/org/slf4j/slf4j-api/1.7.16/slf4j-api-1.7.16.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/org/apache/commons/commons-lang3/3.0/commons-lang3-3.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/com/wiley/alm/woladapter/1.0.1/woladapter-1.0.1.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/commons-logging/commons-logging/1.2/commons-logging-1.2.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/com/wiley/alm/common-components/1.0.1/common-components-1.0.1.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/com/zaxxer/HikariCP-java7/2.4.9/HikariCP-java7-2.4.9.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/com/google/guava/guava/15.0/guava-15.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/central/joda-time/joda-time/2.3/joda-time-2.3.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/oimclient/11.1.2.2.0.0.0/oimclient-11.1.2.2.0.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jrf-api/11.1.1.0.0/jrf-api-11.1.1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/thirdparty/com/oracle/ojdbc6/11.2.0.3/ojdbc6-11.2.0.3.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/iam-platform-auth-server/1.0.0/iam-platform-auth-server-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/iam-platform-utils/1.0.0/iam-platform-utils-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/identitystore/1.0.0/identitystore-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jacc-spi/1.0.0/jacc-spi-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/javax.management.j2ee_1.0/1.0.0/javax.management.j2ee_1.0-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/javax.servlet_1.0.0.0_2-5/1.0.0/javax.servlet_1.0.0.0_2-5-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jmxframework/1.0.0/jmxframework-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jmxspi/1.0.0/jmxspi-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-api/1.0.0/jps-api-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-az-api/1.0.0/jps-az-api-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-az-common/1.0.0/jps-az-common-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-az-management/1.0.0/jps-az-management-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-az-rt/1.0.0/jps-az-rt-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-az-sspi/1.0.0/jps-az-sspi-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-common/1.0.0/jps-common-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-ee/1.0.0/jps-ee-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-internal/1.0.0/jps-internal-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-manifest/1.0.0/jps-manifest-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-mbeans/1.0.0/jps-mbeans-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-platform/1.0.0/jps-platform-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-unsupported-api/1.0.0/jps-unsupported-api-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-wls-trustprovider/1.0.0/jps-wls-trustprovider-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-wls/1.0.0/jps-wls-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/oraclepki/1.0.0/oraclepki-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/osdt_xmlsec/1.0.0/osdt_xmlsec-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/osdt_core/1.0.0/osdt_core-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/osdt_cert/1.0.0/osdt_cert-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/javax.persistence/1.0.0/javax.persistence-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/org.eclipse.persistence_1.2.0.0_2-3/1.0.0/org.eclipse.persistence_1.2.0.0_2-3-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/wlfullclient/1.0.0/wlfullclient-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/jps-se/1.0.0/jps-se-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/spring/1.0.0/spring-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/ldapjclnt11/1.0.0/ldapjclnt11-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/fmw_audit/1.0.0/fmw_audit-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+    <get src="http://devops.wiley.com/nexus/content/repositories/releases/custom/com/oracle/identitydirectory/1.0.0/identitydirectory-1.0.0.jar" 
+         dest="${project.lib.dir}" 
+         usetimestamp="true" 
+         ignoreerrors="false"/>
+   	
+  	<get src="http://devops.wiley.com/nexus/content/repositories/central/com/opencsv/opencsv/3.3/opencsv-3.3.jar" 
+  	         dest="${project.lib.dir}" 
+  	         usetimestamp="true" 
+  	         ignoreerrors="false"/>
+  	
+  	<get src="http://devops.wiley.com/nexus/content/repositories/central/org/glassfish/jersey/media/jersey-media-multipart/2.25/jersey-media-multipart-2.25.jar" 
+  	  	         dest="${project.lib.dir}" 
+  	  	         usetimestamp="true" 
+  	  	         ignoreerrors="false"/>
+  	
+  	<get src="http://devops.wiley.com/nexus/content/repositories/central/commons-codec/commons-codec/1.9/commons-codec-1.9.jar" 
+  	  	  	         dest="${project.lib.dir}" 
+  	  	  	         usetimestamp="true" 
+  	  	  	         ignoreerrors="false"/>
+ 	
+  	<get src="http://devops.wiley.com/nexus/content/repositories/central/commons-codec/commons-codec/1.9/commons-codec-1.9.jar" 
+  	  	  	  	         dest="${project.lib.dir}" 
+  	  	  	  	         usetimestamp="true" 
+  	  	  	  	         ignoreerrors="false"/>
+  	
+  	
+  </target>
+
+</project>

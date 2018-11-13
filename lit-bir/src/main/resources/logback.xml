@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date %level [%thread] [%mdc{messageId}] %logger.%M : %line : %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+   <appender name="FILE"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${app.log.root}/create-transaction.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${app.log.root}/archived/create-transaction-%d{yyyy-MM-dd-HH}.log
+            </FileNamePattern>
+        </rollingPolicy>
+
+        <encoder>
+            <Pattern>%date %level [%thread] %logger.%M : %line : %msg%n</Pattern>
+        </encoder>
+    </appender>
+    
+    <logger name="com.wiley.utility.create.transaction" level="${app.root.log.level:-DEBUG}" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+    
+    <logger name="com.wiley.alm" level="${app.root.log.level:-DEBUG}" additivity="false">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+    
+
+    <root level="${app.root.log.level:-DEBUG}">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+  
+ </configuration>
