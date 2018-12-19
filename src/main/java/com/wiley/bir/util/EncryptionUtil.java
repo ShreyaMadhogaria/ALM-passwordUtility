@@ -23,8 +23,8 @@ import com.wiley.bir.exception.EncryptionException;
 
 public class EncryptionUtil {
 
-	private static final String IV = "WILEYINIVECPARAM";
-	private static final String ENCRYPTION_KEY_SALT = "W!l3YsLt";
+	public static final String IV = "ALMTOBIRIVCPARAM";
+	public static final String ENCRYPTION_KEY_SALT = "6?!7YWtC";
 	private static final String TRANSFORMATION_TYPE = "AES/CBC/PKCS5PADDING";
 	private static final String PROVIDER = "SunJCE";
 	private static final String ENCODING_TYPE = "UTF-8";

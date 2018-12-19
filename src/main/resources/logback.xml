@@ -10,10 +10,10 @@
     
    <appender name="FILE"
         class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${app.log.root}/create-transaction.log</file>
+        <file>${app.log.root}/password-utility.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${app.log.root}/archived/create-transaction-%d{yyyy-MM-dd-HH}.log
+            <FileNamePattern>${app.log.root}/archived/password-utility-%d{yyyy-MM-dd-HH}.log
             </FileNamePattern>
         </rollingPolicy>
 
@@ -22,17 +22,11 @@
         </encoder>
     </appender>
     
-    <logger name="com.wiley.utility.create.transaction" level="${app.root.log.level:-DEBUG}" additivity="false">
+    <logger name="com.wiley.bir.application" level="${app.root.log.level:-DEBUG}" additivity="false">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </logger>
     
-    <logger name="com.wiley.alm" level="${app.root.log.level:-DEBUG}" additivity="false">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </logger>
-    
-
     <root level="${app.root.log.level:-DEBUG}">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
